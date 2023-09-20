@@ -601,6 +601,16 @@ describe("NGINX conf compiler", function()
         assert.matches("large_client_header_buffers%s+16 24k;", nginx_conf)
       end)
 
+      it("injects nginx_proxy_location_* directives", function()
+        local conf = assert(conf_loader(nil, {
+          nginx_proxy_location_proxy_ignore_headers = "X-Accel-Redirect",
+          nginx_proxy_location_proxy_pass_header = "X-Accel-Redirect",
+        }))
+        local nginx_conf = prefix_handler.compile_kong_conf(conf)
+        assert.matches("proxy_ignore_headers%s+X-Accel-Redirect", nginx_conf)
+        assert.matches("proxy_pass_header%s+X-Accel-Redirect", nginx_conf)
+      end)
+
       it("injects nginx_admin_* directives", function()
         local conf = assert(conf_loader(nil, {
           nginx_admin_large_client_header_buffers = "4 24k",
